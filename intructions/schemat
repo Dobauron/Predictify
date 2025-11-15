@@ -1,0 +1,173 @@
+[Etap 0: Definicja celu]
+            |
+            v
+[Etap 1: Analiza sektorów]
+    - pobranie danych historycznych (ceny sektorów, BEA, BLS, FRED, ETF flows)
+    - feature engineering (momentum, makro, przepływy, ryzyko, sentiment)
+    - model ML / regresja do wyliczenia wag
+    - ranking sektorów
+            |
+            v
+[Etap 2: Wybór spółek w top sektorach]
+    - pobranie fundamentów spółek (revenue, EPS, margin, debt, P/E)
+    - cechy techniczne spółki (SMA, RSI, MACD, volatility)
+    - scoring spółki (ML / multi-factor)
+    - ranking spółek
+            |
+            v
+[Etap 3: Timing wejścia]
+    - analiza techniczna (trend, pullback, breakout, RSI, OBV)
+    - wybór momentu wejścia
+            |
+            v
+[Etap 4: Pozycja / risk management]
+    - stop-loss / take-profit
+    - sizing pozycji
+    - monitoring
+            |
+            v
+[Etap 5: Walidacja i optymalizacja]
+    - backtesting walk-forward
+    - metryki: MAE, directional accuracy, CAGR, Sharpe
+    - optymalizacja cech i modeli
+
+
+
+# struktura projetku
+
+project_root/
+│
+├─ data/
+│   ├─ raw/          # surowe dane: yfinance, BEA, FRED, EDGAR
+│   └─ processed/    # po ETL i feature engineering
+│
+├─ notebooks/        # eksperymenty, analizy, wizualizacje
+│
+├─ src/
+│   ├─ etl/          # pobieranie i czyszczenie danych
+│   │   ├─ sector_data.py
+│   │   └─ fundamentals_data.py
+│   │
+│   ├─ features/     # feature engineering
+│   │   ├─ sector_features.py
+│   │   ├─ stock_features.py
+│   │   └─ technical_features.py
+│   │
+│   ├─ models/       # modele ML i scoring
+│   │   ├─ sector_model.py
+│   │   ├─ stock_model.py
+│   │   └─ training_utils.py
+│   │
+│   ├─ ranking/      # ranking sektorów i spółek
+│   └─ backtest/     # moduły do testowania strategii
+│
+├─ config/           # pliki konfiguracyjne, np. API keys, parametry modeli
+├─ results/          # wykresy, rankingi, raporty
+└─ main.py           # pipeline uruchamiający cały system
+
+
+
+III. Plan punkt po punkcie
+    Etap 0 — Definicja celu
+
+        Określ horyzont predykcji (np. next month return).   Miesiąc do przodu
+
+        Zdefiniuj target: % wzrostu lub klasyfikacja up/down.  >> 50 %
+
+        Określ dostępne dane i API.
+            Dane z US BUREAU of economic Analysis :
+                GDPbyIndustry - główne dane sektorowe (VA, GO, GDP Contribution, wages)
+                        table_map = {
+                            "1": "VA",                # Value Added
+                            "5": "VA_percentGDP",     # % Contribution to GDP
+                            "15": "GO",               # Gross Output
+                            "208": "Wages"            # Compensation / Wages
+                        }
+
+                UnderlyingGDPbyIndustry - Podsektory do rozważenia
+                InputOutput - przepływy miedzy sektorami
+
+
+Etap 1 — Analiza sektorów
+
+    Pobierz historyczne ceny ETF sektorowych / indeksy (yfinance).
+
+    Pobierz makro / sektorowe wskaźniki (BEA, BLS, FRED).
+
+    Pobierz przepływy kapitału (ETF inflows, wolumen).
+
+    Oblicz cechy:
+
+        Momentum: 1M, 3M, 6M, relative strength
+
+        Makro: GVA growth, revenue growth, productivity
+
+        Przepływy: ETF inflows, volume change
+
+        Ryzyko: beta, 20d volatility, drawdown
+
+        Sentiment (opcjonalnie)
+
+    Zbuduj dataset sektorów → cechy + target (next month return).
+
+    Naucz model (lin reg, Lasso, XGBoost) → wyznacz optymalne wagi.
+
+    Oblicz final_sector_score i ranking sektorów.
+
+Etap 2 — Wybór spółek
+
+    Pobierz fundamentalne dane spółek w top sektorach (EDGAR, API).
+
+    Oblicz cechy fundamentalne:
+
+        revenue growth, EPS, margin, debt/EBITDA, ROIC
+
+        revision analyst estimates
+
+    Oblicz cechy techniczne:
+
+        SMA, EMA, RSI, MACD, Bollinger Bands, volatility
+
+    Zbuduj scoring spółki (multi-factor lub ML) → ranking.
+
+    Wybierz top-k spółek do obserwacji / wejścia.
+
+Etap 3 — Timing wejścia
+
+    Analiza trendów i momentum (cena > EMA50, SMA cross).
+
+    Pullback / breakout / RSI divergence.
+
+    Wybór momentu wejścia i poziomu stop-loss / take-profit.
+
+    Monitorowanie pozycji.
+
+Etap 4 — Risk management
+
+    Określ max % portfela na spółkę.
+
+    Zdefiniuj stop-loss i take-profit.
+
+    Zastosuj hedging / ograniczenie ryzyka (opcjonalnie).
+
+    Dokumentuj decyzje dla każdej pozycji.
+
+Etap 5 — Walidacja i optymalizacja
+
+    Backtesting:
+
+        walk-forward / expanding window
+
+        porównanie z benchmarkiem (S&P500 / sektorowy ETF)
+
+    Metryki:
+
+        MAE / RMSE (jeśli regresja)
+
+        Directional accuracy (up/down)
+
+        CAGR, Sharpe ratio, max drawdown (dla strategii)
+
+    Optymalizacja cech, modeli i parametrów wejścia.
+
+    Wdrożenie pipeline’u do harmonogramu miesięcznego / dziennego.

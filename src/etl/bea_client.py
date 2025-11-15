@@ -80,9 +80,15 @@ class BEAClient:
 
 client = BEAClient()
 
-# Pobranie Value Added by Industry
-df = client.get_data(dataset="GDPbyIndustry", table_name="VA", year="ALL")
-print(df.head())
+df = client.get_data(
+    datasetname="GDPbyIndustry",  # poprawna wielkość liter!
+    table_name="VA",
+    year="ALL"
+)
 
-# Zapis do CSV w folderze data/raw
-client.save_to_csv(dataset="GDPbyIndustry", table_name="VA", filename="data/raw/sector_data.csv")
+print(df.head())
+client.save_to_csv(
+    datasetname="GDPbyIndustry",
+    table_name="VA",
+    filename="data/raw/value_added.csv"
+)

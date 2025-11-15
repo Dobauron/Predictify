@@ -1,0 +1,3 @@
+BEAAPI
+"{'RequestParam': [{'ParameterName': 'USERID', 'ParameterValue': '25E3B65A-69CC-4ADB-9B12-1ED8D7011D18'}, {'ParameterName': 'DATASET', 'ParameterValue': 'GDPBYINDUSTRY'}, {'ParameterName': 'TABLENAME', 'ParameterValue': 'VA'}, {'ParameterName': 'YEAR', 'ParameterValue': 'ALL'}, {'ParameterName': 'RESULTFORMAT', 'ParameterValue': 'JSON'}]}"
+"{'Error': {'APIErrorCode': '20', 'APIErrorDescription': 'The Dataset requested does not exist.'}}"

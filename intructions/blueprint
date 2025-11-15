@@ -1,0 +1,94 @@
+Data Loader (many tickers)  --> Preprocessor (per-ticker scalers, feature engineering)
+                 │
+                 └──── merged dataset (ticker, date, seq, fund_vector, sector_id)
+                                  │
+                                  ▼
+                    ┌────────────────────────────┐
+                    │  Technical branch (LSTM)   │  <- input: seq_len x n_tech_features
+                    └────────────────────────────┘
+                                  │  (last hidden)
+                                  ▼
+                    ┌────────────────────────────┐
+                    │  Concatenate:              │
+                    │  [tech_embedding, fund_vec,│
+                    │   sector_embedding]        │
+                    └────────────────────────────┘
+                                  │
+                                  ▼
+                    ┌────────────────────────────┐
+                    │  Fusion Dense / Attention  │
+                    └────────────────────────────┘
+                                  │
+                    ┌─────────────┴──────────────┐
+                    │                            │
+            Head for AAPL                 Head for MSFT  (each: Dense -> scalar(s))
+            (stock-specific)              (stock-specific)
+
+
+trend_predictor/
+├─ data/
+├─ src/
+│  ├─ data_loader.py          # pobiera tickery, price & indicators
+│  ├─ fundamentals_loader.py  # pobiera fundaments via yfinance
+│  ├─ features.py             # RSI, MACD, flags, forward-fill fundamentals
+│  ├─ scalers.py              # per-ticker scaler_map and save/load
+│  ├─ dataset.py              # PyTorch Dataset (multi-stock)
+│  ├─ models/
+│  │   ├─ tech_backbone.py    # LSTM/Transformer
+│  │   ├─ fusion_model.py     # Fusion + stock heads
+│  │   └─ losses.py
+│  ├─ train.py
+│  ├─ eval.py
+│  └─ utils.py
+├─ tests/
+└─ config/
+
+
+:
+
+🔹 Plan budowy modelu łączącego dane techniczne, fundamentalne i indeksowe
+
+Wybór spółek i indeksu odniesienia - NVDA, AAPL, MSFT, GOOGL, AMZN
+
+Pobranie danych rynkowych (technicznych)
+
+Pobranie danych fundamentalnych
+    rosnace przychody
+    rosnący zysk netto
+    rosnąca gotówka z działalności !!! Ważne
+    rosnąca marża z działalności
+    prognozy wzrostu zyskowności
+    Dodać wagi do poszczególnych wartości dla danych fundamentalnych
+Pobranie danych indeksowych (benchmark)
+
+Feature engineering – dane techniczne
+
+Feature engineering – dane fundamentalne
+
+Feature engineering – dane indeksowe
+
+Scalenie wszystkich źródeł danych
+
+Przygotowanie sekwencji czasowych do uczenia
+
+Budowa klasy DataPreprocessor
+
+Budowa klasy MultiStockDataset (dla wielu spółek)
+
+Projekt architektury modelu (multi-input)
+
+Implementacja modelu (LSTM + Dense fusion)
+
+Konfiguracja procesu trenowania (loss, optymalizator, metryki)
+
+Trenowanie modelu
+
+Ewaluacja na danych historycznych
+
+Porównanie z indeksem (np. NASDAQ 100)
+
+Testy jednostkowe (preprocessing, integracja, model)
+
+Analiza wyników i wizualizacja
+
+Eksperymenty i tuning (seq_length, hyperparametry, feature importance)
