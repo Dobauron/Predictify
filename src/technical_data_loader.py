@@ -10,7 +10,7 @@ class TechnicalDataLoader:
     """
 
     def __init__(self, tickers, start="2015-01-01", end="2025-01-01",
-                 interval="1d", save_dir="EvaSto/data/technicals"):
+                 interval="1d", save_dir="Predictify/data/technicals"):
         self.tickers = [ticker.upper() for ticker in tickers]
         self.start = start
         self.end = end
