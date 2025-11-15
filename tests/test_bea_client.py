@@ -1,7 +1,6 @@
 import pandas as pd
 from src.etl.bea_client import BEAClient
 
-
 def test_env_key_loaded(monkeypatch):
     monkeypatch.setenv("BEA_API_KEY", "TEST_KEY")
     client = BEAClient()
